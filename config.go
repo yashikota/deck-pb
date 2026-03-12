@@ -82,8 +82,19 @@ func FindConfigFile() string {
 	return ""
 }
 
+// DefaultConfig returns a Config with all default values applied.
+func DefaultConfig() *Config {
+	cfg := &Config{Progress: &ProgressConfig{}}
+	cfg.Progress.applyDefaults()
+	return cfg
+}
+
 // LoadConfig reads and parses a YAML configuration file.
+// If path is empty, returns the default configuration.
 func LoadConfig(path string) (*Config, error) {
+	if path == "" {
+		return DefaultConfig(), nil
+	}
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read config file: %w", err)
