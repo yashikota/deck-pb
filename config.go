@@ -63,10 +63,12 @@ func (c *ProgressConfig) validate() error {
 // defaultConfigSearchPaths returns config file paths in priority order (highest first).
 func defaultConfigSearchPaths() []string {
 	paths := []string{
-		"deck-pb.yml", // local (current directory)
+		"deck-pb.yml",
+		"deck-pb.yaml",
 	}
 	if home, err := os.UserHomeDir(); err == nil {
-		paths = append(paths, filepath.Join(home, ".config", "deck-pb", "config.yml"))
+		globalDir := filepath.Join(home, ".config", "deck-pb")
+		paths = append(paths, filepath.Join(globalDir, "config.yml"), filepath.Join(globalDir, "config.yaml"))
 	}
 	return paths
 }
