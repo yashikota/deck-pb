@@ -44,7 +44,14 @@ var applyCmd = &cobra.Command{
 			return err
 		}
 
-		cfg, err := LoadConfig(configFile)
+		cfgPath := configFile
+		if !cmd.Flags().Changed("config") {
+			if found := FindConfigFile(); found != "" {
+				cfgPath = found
+			}
+		}
+
+		cfg, err := LoadConfig(cfgPath)
 		if err != nil {
 			return err
 		}
@@ -127,7 +134,7 @@ func readPresentationIDFromFrontmatter(mdFile string) (string, error) {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "deck-pb.yml", "config file path")
+	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "config file path (default: ./deck-pb.yml or ~/.config/deck-pb/config.yml)")
 	rootCmd.PersistentFlags().StringVar(&profile, "profile", "", "deck authentication profile")
 
 	rootCmd.AddCommand(applyCmd)

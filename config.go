@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/goccy/go-yaml"
 )
@@ -57,6 +58,28 @@ func (c *ProgressConfig) validate() error {
 		return fmt.Errorf("endPage (%d) must be >= startPage (%d)", c.EndPage, c.StartPage)
 	}
 	return nil
+}
+
+// defaultConfigSearchPaths returns config file paths in priority order (highest first).
+func defaultConfigSearchPaths() []string {
+	paths := []string{
+		"deck-pb.yml", // local (current directory)
+	}
+	if home, err := os.UserHomeDir(); err == nil {
+		paths = append(paths, filepath.Join(home, ".config", "deck-pb", "config.yml"))
+	}
+	return paths
+}
+
+// FindConfigFile returns the first existing config file from the search paths.
+// Returns empty string if none found.
+func FindConfigFile() string {
+	for _, p := range defaultConfigSearchPaths() {
+		if _, err := os.Stat(p); err == nil {
+			return p
+		}
+	}
+	return ""
 }
 
 // LoadConfig reads and parses a YAML configuration file.
